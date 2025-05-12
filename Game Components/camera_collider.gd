@@ -16,9 +16,6 @@ var curr_distance: float = 0:
 
 
 func _physics_process(delta: float) -> void:
-	if not is_multiplayer_authority():
-		hide()
-		return
 	curr_distance = lerp(curr_distance, target_distance, smooth_speed * delta)
 	var space_state = get_world_3d().direct_space_state
 	var origin = parent.global_position
@@ -32,3 +29,4 @@ func _physics_process(delta: float) -> void:
 		var dist = (pos - parent.global_position).length()
 		if dist < curr_distance:
 			curr_distance = dist
+

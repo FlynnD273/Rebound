@@ -27,7 +27,7 @@ func host_game() -> void:
 	peer.peer_connected.connect(peer_connected)
 	var game: GameManager = tree.current_scene
 	game.multiplayer.multiplayer_peer = peer
-	spawn_player(multiplayer.get_unique_id())
+	spawn_player(1)
 
 
 func peer_connected(pid: int) -> void:

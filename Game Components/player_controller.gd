@@ -46,7 +46,7 @@ var grabbed_rock: RockController:
 ## Used for multiplayer syncing
 @export var grabbed_rock_id: int
 
-var pid: int
+var pid: int = 1
 
 
 func _enter_tree() -> void:
@@ -125,3 +125,4 @@ func _physics_process(delta: float) -> void:
 	handle_rock_movement(delta)
 	was_on_floor = is_on_floor()
 	move_and_slide()
+
