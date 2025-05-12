@@ -29,4 +29,3 @@ func _physics_process(delta: float) -> void:
 		var dist = (pos - parent.global_position).length()
 		if dist < curr_distance:
 			curr_distance = dist
-

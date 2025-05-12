@@ -24,3 +24,7 @@ func _ready() -> void:
 						mesh_instance.set_surface_override_material(i, new_mat)
 					else:
 						mesh_instance.set_surface_override_material(i, null)
+
+@rpc("any_peer", "call_local", "unreliable_ordered")
+func add_force(force: Vector3) -> void:
+	linear_velocity += force

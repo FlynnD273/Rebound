@@ -26,6 +26,8 @@ var can_float := false
 
 @export_group("Grabbed Rocks")
 
+@export var grab_radius: float = 10
+
 ## Amount the rock gets pulled
 @export var rock_pull: float = 1
 
@@ -46,11 +48,9 @@ var grabbed_rock: RockController:
 ## Used for multiplayer syncing
 @export var grabbed_rock_id: int
 
-var pid: int = 1
-
 
 func _enter_tree() -> void:
-	set_multiplayer_authority(pid)
+	set_multiplayer_authority(int(name.substr("Player ".length())), true)
 
 
 func _ready() -> void:
@@ -66,7 +66,7 @@ func handle_rocks() -> void:
 		var rock: RockController
 		for curr_rock in game_manager.rock_parent.get_children():
 			var dist: float = (curr_rock.global_position - global_position).length_squared()
-			if dist < min_dist:
+			if dist < min_dist and dist < grab_radius:
 				min_dist = dist
 				rock = curr_rock
 		if is_instance_valid(rock):
@@ -80,8 +80,8 @@ func handle_rocks() -> void:
 func handle_rock_movement(delta: float) -> void:
 	if is_instance_valid(grabbed_rock):
 		var diff := global_position - grabbed_rock.global_position
-		grabbed_rock.linear_velocity += (
-			(diff.normalized() * rock_pull * diff.length_squared()) * delta
+		grabbed_rock.add_force.rpc_id(
+			1, (diff.normalized() * rock_pull * diff.length_squared()) * delta
 		)
 		if Input.is_action_pressed("Pull"):
 			velocity += -(diff.normalized() * player_pull * diff.length_squared()) * delta
@@ -125,4 +125,3 @@ func _physics_process(delta: float) -> void:
 	handle_rock_movement(delta)
 	was_on_floor = is_on_floor()
 	move_and_slide()
-

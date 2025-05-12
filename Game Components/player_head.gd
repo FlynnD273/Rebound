@@ -3,11 +3,6 @@ extends Node3D
 @export var head: Node3D
 
 
-func _ready() -> void:
-	if not is_multiplayer_authority():
-		hide()
-
-
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		Input.mouse_mode = Input.MouseMode.MOUSE_MODE_CAPTURED
@@ -18,5 +13,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _process(_delta: float) -> void:
+	if not is_multiplayer_authority():
+		queue_free()
 	if Input.is_action_just_pressed("Exit"):
 		Input.mouse_mode = Input.MouseMode.MOUSE_MODE_VISIBLE

@@ -39,6 +39,5 @@ func spawn_player(pid: int) -> void:
 	var player := player_scene.instantiate()
 	player.position.y = 3
 	player.name = "Player " + str(pid)
-	player.pid = pid
-	tree.current_scene.player_parent.add_child(player)
+	tree.current_scene.player_parent.add_child(player, true)
 	player.game_manager = tree.current_scene
