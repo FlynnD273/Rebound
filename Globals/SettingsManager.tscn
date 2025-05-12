@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cy5bye4fd25j5"]
+
+[ext_resource type="Script" uid="uid://bh4xs05qtgu1m" path="res://Globals/settings_manager.gd" id="1_3ouvp"]
+
+[node name="SettingsManager" type="Node"]
+script = ExtResource("1_3ouvp")
+mouse_sensitivity = 0.225225

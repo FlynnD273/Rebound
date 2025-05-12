@@ -1,0 +1,18 @@
+[gd_scene load_steps=5 format=3 uid="uid://crlj8e3e3pmt7"]
+
+[ext_resource type="Script" uid="uid://dw4l5r18ph8vv" path="res://Game Components/rock_controller.gd" id="1_ci7or"]
+[ext_resource type="PackedScene" uid="uid://bfv1lvf8ot521" path="res://Models/Rock.blend" id="1_sgcyp"]
+[ext_resource type="Material" uid="uid://fspoplt4yfrb" path="res://Materials/InverseHull.tres" id="2_7knnf"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_4j7xa"]
+
+[node name="Rock" type="RigidBody3D"]
+collision_mask = 3
+gravity_scale = 0.5
+script = ExtResource("1_ci7or")
+outline_material = ExtResource("2_7knnf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_4j7xa")
+
+[node name="Rock" parent="." instance=ExtResource("1_sgcyp")]

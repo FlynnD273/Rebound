@@ -1,0 +1,89 @@
+[gd_scene load_steps=14 format=3 uid="uid://bkfjvoy35df8l"]
+
+[ext_resource type="Script" uid="uid://cjbywyevqclsb" path="res://game_manager.gd" id="1_7jktm"]
+[ext_resource type="Script" uid="uid://bl06pm638ywui" path="res://player_head.gd" id="1_80nbo"]
+[ext_resource type="Texture2D" uid="uid://bnf6j4ndfvor8" path="res://checkerboard.jpg" id="1_fc0e3"]
+[ext_resource type="Script" uid="uid://ham6luk12vb8" path="res://player_controller.gd" id="1_feb5d"]
+[ext_resource type="Script" uid="uid://b1sm85vd6f8qa" path="res://camera_collider.gd" id="2_e2o6t"]
+[ext_resource type="PackedScene" uid="uid://crlj8e3e3pmt7" path="res://Game Components/Rock.tscn" id="2_ryrav"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e2o6t"]
+albedo_color = Color(0.226337, 0.172447, 0.266318, 1)
+albedo_texture = ExtResource("1_fc0e3")
+
+[sub_resource type="QuadMesh" id="QuadMesh_mwb40"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mwb40"]
+size = Vector3(1, 1, 0.01)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryrav"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_mwb40"]
+material = SubResource("StandardMaterial3D_ryrav")
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mwb40"]
+
+[sub_resource type="Environment" id="Environment_ryrav"]
+glow_enabled = true
+glow_blend_mode = 0
+glow_hdr_threshold = 2.0
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_7jktm")
+rock_scene = ExtResource("2_ryrav")
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(100, 0, 0, 0, -4.37114e-06, 100, 0, -100, -4.37114e-06, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_e2o6t")
+mesh = SubResource("QuadMesh_mwb40")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.004)
+shape = SubResource("BoxShape3D_mwb40")
+
+[node name="Player" type="CharacterBody3D" parent="." node_paths=PackedStringArray("game_manager", "player_camera")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0543, 0)
+collision_mask = 3
+script = ExtResource("1_feb5d")
+game_manager = NodePath("..")
+player_camera = NodePath("Neck/Head/CameraCollider/MainCamera")
+coyote_time = 0.5
+variable_jump_float = 60.0
+movement_speed = 200.0
+rock_pull = 2.0
+
+[node name="Mesh" type="MeshInstance3D" parent="Player"]
+mesh = SubResource("CapsuleMesh_mwb40")
+
+[node name="Collision" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_mwb40")
+
+[node name="Neck" type="Node3D" parent="Player" node_paths=PackedStringArray("head")]
+script = ExtResource("1_80nbo")
+head = NodePath("Head")
+
+[node name="Head" type="Node3D" parent="Player/Neck"]
+
+[node name="CameraCollider" type="Node3D" parent="Player/Neck/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.80247, 1.25, 5)
+script = ExtResource("2_e2o6t")
+smooth_speed = 20.0
+
+[node name="MainCamera" type="Camera3D" parent="Player/Neck/Head/CameraCollider"]
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.462786, 0.88647, 0, -0.88647, 0.462786, 0, 6.45703, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+
+[node name="Timer" type="Timer" parent="."]
+autostart = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ryrav")
+
+[connection signal="timeout" from="Timer" to="." method="spawn_rock"]
