@@ -17,6 +17,7 @@ var can_float := false
 @export var variable_jump_float: float = 20
 
 @export_group("Movement")
+
 ## Horizontal movement speed multiplier
 @export var movement_speed: float = 5
 
@@ -24,12 +25,32 @@ var can_float := false
 @export var movement_friction: float = 0.8
 
 @export_group("Grabbed Rocks")
+
 ## Amount the rock gets pulled
 @export var rock_pull: float = 1
+
 ## Amount the player gets pulled
 @export var player_pull: float = 5
 
-var grabbed_rock: RockController
+## The rock that the player's currently holding
+var grabbed_rock: RockController:
+	set(value):
+		grabbed_rock = value
+		if is_instance_valid(grabbed_rock):
+			grabbed_rock_id = grabbed_rock.id
+		else:
+			grabbed_rock_id = -1
+
+@export_group("Readonly")
+
+## Used for multiplayer syncing
+@export var grabbed_rock_id: int
+
+var pid: int
+
+
+func _enter_tree() -> void:
+	set_multiplayer_authority(pid)
 
 
 func _ready() -> void:
@@ -39,8 +60,8 @@ func _ready() -> void:
 	add_child(coyote_timer)
 
 
-func _physics_process(delta: float) -> void:
-	if not is_instance_valid(grabbed_rock):
+func handle_rocks() -> void:
+	if not is_instance_valid(grabbed_rock) and is_instance_valid(game_manager):
 		var min_dist: float = 9999
 		var rock: RockController
 		for curr_rock in game_manager.rock_parent.get_children():
@@ -54,6 +75,19 @@ func _physics_process(delta: float) -> void:
 				grabbed_rock = rock
 	if Input.is_action_just_released("Grab"):
 		grabbed_rock = null
+
+
+func handle_rock_movement(delta: float) -> void:
+	if is_instance_valid(grabbed_rock):
+		var diff := global_position - grabbed_rock.global_position
+		grabbed_rock.linear_velocity += (
+			(diff.normalized() * rock_pull * diff.length_squared()) * delta
+		)
+		if Input.is_action_pressed("Pull"):
+			velocity += -(diff.normalized() * player_pull * diff.length_squared()) * delta
+
+
+func handle_movement(delta: float) -> void:
 	velocity += gravity * delta
 	var movement_input := Input.get_vector("Left", "Right", "Up", "Down") * movement_speed
 	movement_input *= delta
@@ -81,12 +115,13 @@ func _physics_process(delta: float) -> void:
 		velocity.y += variable_jump_float * delta
 	if not Input.is_action_pressed("Jump"):
 		can_float = false
+
+
+func _physics_process(delta: float) -> void:
+	if not is_multiplayer_authority():
+		return
+	handle_rocks()
+	handle_movement(delta)
+	handle_rock_movement(delta)
 	was_on_floor = is_on_floor()
-	if is_instance_valid(grabbed_rock):
-		var diff := global_position - grabbed_rock.global_position
-		grabbed_rock.linear_velocity += (
-			(diff.normalized() * rock_pull * diff.length_squared()) * delta
-		)
-		if Input.is_action_pressed("Pull"):
-			velocity += -(diff.normalized() * player_pull * diff.length_squared()) * delta
 	move_and_slide()

@@ -11,19 +11,19 @@ config_version=5
 [application]
 
 config/name="Rebound"
-run/main_scene="uid://bkfjvoy35df8l"
+run/main_scene="uid://dmlvfgo7nqc14"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.svg"
 
 [autoload]
 
 SETTINGS="*res://Globals/SettingsManager.tscn"
+MULTI="*res://Globals/MultiplayerManager.tscn"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=4
 
 [input]
 

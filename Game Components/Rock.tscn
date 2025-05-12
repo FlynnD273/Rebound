@@ -1,10 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://crlj8e3e3pmt7"]
+[gd_scene load_steps=6 format=3 uid="uid://crlj8e3e3pmt7"]
 
 [ext_resource type="Script" uid="uid://dw4l5r18ph8vv" path="res://Game Components/rock_controller.gd" id="1_ci7or"]
 [ext_resource type="PackedScene" uid="uid://bfv1lvf8ot521" path="res://Models/Rock.blend" id="1_sgcyp"]
 [ext_resource type="Material" uid="uid://fspoplt4yfrb" path="res://Materials/InverseHull.tres" id="2_7knnf"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_4j7xa"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_7knnf"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [node name="Rock" type="RigidBody3D"]
 collision_mask = 3
@@ -16,3 +24,6 @@ outline_material = ExtResource("2_7knnf")
 shape = SubResource("SphereShape3D_4j7xa")
 
 [node name="Rock" parent="." instance=ExtResource("1_sgcyp")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_7knnf")

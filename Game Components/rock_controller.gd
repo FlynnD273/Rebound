@@ -1,6 +1,15 @@
 extends RigidBody3D
 class_name RockController
 
+static var rock_total := 0
+var id: int
+
+
+func _ready() -> void:
+	id = rock_total
+	rock_total += 1
+
+
 @export var outline_material: Material
 @export var outlined := false:
 	set(value):

@@ -4,7 +4,10 @@ class_name GameManager
 @export var rock_scene: PackedScene
 
 var target_position := Vector3.ZERO
-var rock_parent: Node
+## The parent node to add all the spawned rocks to
+@export var rock_parent: Node
+
+## The currently highlighted rock
 var hovered_rock: RockController:
 	set(value):
 		if value == hovered_rock:
@@ -16,17 +19,19 @@ var hovered_rock: RockController:
 
 var window: Window
 
+@export var player_parent: Node
+
 
 func _ready() -> void:
 	window = get_viewport().get_window()
 
-	rock_parent = Node.new()
-	add_child(rock_parent)
-
 
 func spawn_rock() -> void:
+	if not is_multiplayer_authority():
+		return
 	var rock: RockController = rock_scene.instantiate()
-	rock_parent.add_child(rock)
+	rock.name = "Rock " + str(rock.id)
+	rock_parent.add_child(rock, true)
 	rock.position = (Vector3.RIGHT * 20) + Vector3.UP * 5
 	rock.linear_velocity = (target_position - rock.position) / 2
 	rock.angular_velocity = (
@@ -41,3 +46,7 @@ func _process(_delta: float) -> void:
 			window.mode = Window.MODE_WINDOWED
 		else:
 			window.mode = Window.MODE_EXCLUSIVE_FULLSCREEN
+
+
+func _on_player_spawned(node: Node) -> void:
+	node.game_manager = self

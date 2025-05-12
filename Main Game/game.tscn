@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3 uid="uid://bkfjvoy35df8l"]
+
+[ext_resource type="Script" uid="uid://cjbywyevqclsb" path="res://Main Game/game_manager.gd" id="1_7jktm"]
+[ext_resource type="Texture2D" uid="uid://bnf6j4ndfvor8" path="res://TEMP checkerboard.jpg" id="1_fc0e3"]
+[ext_resource type="PackedScene" uid="uid://crlj8e3e3pmt7" path="res://Game Components/Rock.tscn" id="2_ryrav"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e2o6t"]
+albedo_color = Color(0.226337, 0.172447, 0.266318, 1)
+albedo_texture = ExtResource("1_fc0e3")
+
+[sub_resource type="QuadMesh" id="QuadMesh_mwb40"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mwb40"]
+size = Vector3(1, 1, 0.01)
+
+[sub_resource type="Environment" id="Environment_ryrav"]
+glow_enabled = true
+glow_blend_mode = 0
+glow_hdr_threshold = 2.0
+
+[node name="Game" type="Node3D" node_paths=PackedStringArray("rock_parent", "player_parent")]
+script = ExtResource("1_7jktm")
+rock_scene = ExtResource("2_ryrav")
+rock_parent = NodePath("Rocks")
+player_parent = NodePath("Players")
+
+[node name="RockSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://crlj8e3e3pmt7")
+spawn_path = NodePath("../Rocks")
+
+[node name="Rocks" type="Node" parent="."]
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://b53t4b0ri8y0a")
+spawn_path = NodePath("../Players")
+
+[node name="Players" type="Node" parent="."]
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(100, 0, 0, 0, -4.37114e-06, 100, 0, -100, -4.37114e-06, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_e2o6t")
+mesh = SubResource("QuadMesh_mwb40")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Ground"]
+collision_layer = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.004)
+shape = SubResource("BoxShape3D_mwb40")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.462786, 0.88647, 0, -0.88647, 0.462786, 0, 6.45703, 0)
+shadow_enabled = true
+directional_shadow_mode = 0
+
+[node name="RockSpawnTimer" type="Timer" parent="."]
+autostart = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ryrav")
+
+[connection signal="spawned" from="PlayerSpawner" to="." method="_on_player_spawned"]
+[connection signal="timeout" from="RockSpawnTimer" to="." method="spawn_rock"]
